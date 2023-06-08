@@ -3,6 +3,7 @@ import * as env from "./env.ts";
 import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
 import { APP_TLDR } from "./bot/app/app.ts";
+import { tldr, TLDROptions } from "./tldr.ts";
 
 const api = new DiscordAPIClient();
 
@@ -25,9 +26,14 @@ export async function main() {
 
   // In development mode, we use ngrok to expose the server to the Internet.
   if (env.DEV) {
-    doNgrok().then((url) => {
-      console.log("Interactions endpoint URL:", url);
-    });
+    doNgrok()
+      .then((url) => {
+        console.log(`Interactions endpoint URL: ${url}`);
+        console.log(
+          `Discord application information URL: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
+        );
+      })
+      .catch((error) => console.error(error));
   }
 
   // Start the server.
@@ -60,6 +66,63 @@ export async function handle(request: Request): Promise<Response> {
     case discord.InteractionType.Ping: {
       return Response.json({ type: discord.InteractionResponseType.Pong });
     }
+
+    case discord.InteractionType.ApplicationCommand: {
+      if (
+        !discord.Utils.isContextMenuApplicationCommandInteraction(interaction)
+      ) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
+      if (!interaction.member?.user) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
+      if (!interaction.message?.content) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
+      if (!interaction.member.roles.includes(env.DISCORD_ROLE_ID)) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
+      const options: TLDROptions = {
+        apiKey: env.PALM_API_KEY!,
+        author: interaction.member.user.username,
+        message: interaction.message?.content,
+      };
+
+      tldr(options)
+        .then((result) =>
+          api.editOriginalInteractionResponse({
+            botID: env.DISCORD_CLIENT_ID,
+            botToken: env.DISCORD_TOKEN,
+            interactionToken: interaction.token,
+            content: `TLDR: ${result}`,
+          })
+        )
+        .catch((err) => {
+          if (err instanceof Error) {
+            api.editOriginalInteractionResponse({
+              botID: env.DISCORD_CLIENT_ID,
+              botToken: env.DISCORD_TOKEN,
+              interactionToken: interaction.token,
+              content: `Error: ${err.message}`,
+            });
+          }
+        });
+
+      return Response.json(
+        {
+          type:
+            discord.InteractionResponseType.DeferredChannelMessageWithSource,
+          data: {
+            flags: discord.MessageFlags.Ephemeral,
+          },
+        } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource,
+      );
+    }
+
     default: {
       return new Response("Invalid request", { status: 400 });
     }

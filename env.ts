@@ -52,3 +52,12 @@ if (!RAW_DISCORD_ROLE_ID) {
  * application command. The command is intended to be used by board members.
  */
 export const DISCORD_ROLE_ID = RAW_DISCORD_ROLE_ID;
+
+/**
+ * PALM_API_KEY is the API key for the Palm API.
+ */
+export const PALM_API_KEY = Deno.env.get("PALM_API_KEY");
+
+if (!PALM_API_KEY) {
+  throw new Error("PALM_API_KEY environment variable is required");
+}
