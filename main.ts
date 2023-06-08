@@ -2,41 +2,47 @@ import { doNgrok } from "./ngrok.ts";
 import * as env from "./env.ts";
 import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
+import { APP_TLDR } from "./bot/app/app.ts";
 
 const api = new DiscordAPIClient();
 
 if (import.meta.main) {
-	await main();
+  await main();
 }
 
 export async function main() {
-	// TODO: Overwrite the Discord Application Command.
+  // Overwrite the Discord Application Command.
+  await api.registerCommand({
+    app: APP_TLDR,
+    botID: env.DISCORD_CLIENT_ID,
+    botToken: env.DISCORD_TOKEN,
+  });
 
-	console.log(
-		"Add TLDR to your server:",
-		`https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`,
-	);
+  console.log(
+    "Add TLDR to your server:",
+    `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`,
+  );
 
-	// In development mode, we use ngrok to expose the server to the Internet.
-	if (env.DEV) {
-		doNgrok().then((url) => {
-			console.log("Interactions endpoint URL:", url);
-		});
-	}
+  // In development mode, we use ngrok to expose the server to the Internet.
+  if (env.DEV) {
+    doNgrok().then((url) => {
+      console.log("Interactions endpoint URL:", url);
+    });
+  }
 
-	// Start the server.
-	const server = Deno.listen({ port: env.PORT });
-	for await (const conn of server) {
-		serveHttp(conn);
-	}
+  // Start the server.
+  const server = Deno.listen({ port: env.PORT });
+  for await (const conn of server) {
+    serveHttp(conn);
+  }
 }
 
 async function serveHttp(conn: Deno.Conn) {
-	const httpConn = Deno.serveHttp(conn);
-	for await (const requestEvent of httpConn) {
-		const response = await handle(requestEvent.request);
-		requestEvent.respondWith(response);
-	}
+  const httpConn = Deno.serveHttp(conn);
+  for await (const requestEvent of httpConn) {
+    const response = await handle(requestEvent.request);
+    requestEvent.respondWith(response);
+  }
 }
 
 /**
