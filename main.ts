@@ -19,20 +19,24 @@ export async function main() {
   });
 
   console.log(
-    "Add TLDR to your server:",
-    `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`,
+    "TLDR Info:\n\n",
+    `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands\n`,
+    `- URL: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
   );
 
   // Start the server.
   const server = Deno.listen({ port: env.PORT });
   for await (const conn of server) {
+    console.log("please work");
     serveHttp(conn);
   }
 }
 
 async function serveHttp(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn);
+  console.log("u better get this far");
   for await (const requestEvent of httpConn) {
+    console.log(":p");
     const response = await handle(requestEvent.request);
     requestEvent.respondWith(response);
   }
