@@ -48,7 +48,7 @@ if (!RAW_DISCORD_ROLE_ID) {
 }
 
 /**
- * DISCORD_ROLE_ID is the Discord role ID that is allowed to use the Boardd
+ * DISCORD_ROLE_ID is the Discord role ID that is allowed to use the TLDR
  * application command. The command is intended to be used by board members.
  */
 export const DISCORD_ROLE_ID = RAW_DISCORD_ROLE_ID;
