@@ -18,25 +18,24 @@ export async function main() {
     botToken: env.DISCORD_TOKEN,
   });
 
+  // Log the application command.
   console.log(
-    "TLDR Info:\n\n",
+    "TLDR application command:\n",
+    `- Local: http://localhost:${env.PORT}/\n`,
     `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands\n`,
-    `- URL: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
+    `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
   );
 
   // Start the server.
   const server = Deno.listen({ port: env.PORT });
   for await (const conn of server) {
-    console.log("please work");
     serveHttp(conn);
   }
 }
 
 async function serveHttp(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn);
-  console.log("u better get this far");
   for await (const requestEvent of httpConn) {
-    console.log(":p");
     const response = await handle(requestEvent.request);
     requestEvent.respondWith(response);
   }
@@ -53,6 +52,7 @@ export async function handle(request: Request): Promise<Response> {
 
   // Parse the incoming request as JSON.
   const interaction = await JSON.parse(body) as discord.APIInteraction;
+  console.log({ interaction }); // TODO: Delete this console.log.
   switch (interaction.type) {
     case discord.InteractionType.Ping: {
       return Response.json({ type: discord.InteractionResponseType.Pong });

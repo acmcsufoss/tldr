@@ -6,7 +6,7 @@
     "udd": "deno run -r --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts deps.ts && deno task lock",
     "lock": "deno cache --lock=deno.lock --lock-write deps.ts",
     "all": "deno task udd && deno task lint && deno task fmt",
-    "ngrok": "ngrok http 8000",
+    "ngrok": "ngrok http 8080",
     "start": "deno run -A main.ts"
   }
 }
