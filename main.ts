@@ -6,7 +6,7 @@ import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
 const api = new DiscordAPIClient();
 
 if (import.meta.main) {
-	await.main();
+	await main();
 }
 
 export async function main() {
