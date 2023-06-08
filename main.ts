@@ -1,4 +1,3 @@
-import { doNgrok } from "./ngrok.ts";
 import * as env from "./env.ts";
 import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
@@ -23,18 +22,6 @@ export async function main() {
     "Add TLDR to your server:",
     `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`,
   );
-
-  // In development mode, we use ngrok to expose the server to the Internet.
-  if (env.DEV) {
-    doNgrok()
-      .then((url) => {
-        console.log(`Interactions endpoint URL: ${url}`);
-        console.log(
-          `Discord application information URL: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
-        );
-      })
-      .catch((error) => console.error(error));
-  }
 
   // Start the server.
   const server = Deno.listen({ port: env.PORT });
