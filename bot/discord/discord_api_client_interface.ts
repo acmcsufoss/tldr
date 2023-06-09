@@ -26,6 +26,13 @@ export interface DiscordAPIClientInterface {
   editOriginalInteractionResponse(
     o: EditOriginalInteractionResponseOptions,
   ): Promise<void>;
+
+  /**
+   * retrieveGuildUser retrieves a guild user.
+   */
+  retrieveGuildUser(
+    options: RetrieveGuildUserOptions,
+  ): Promise<discord.APIGuildMember>;
 }
 
 /**
@@ -45,4 +52,13 @@ export interface EditOriginalInteractionResponseOptions {
   botToken: string;
   interactionToken: string;
   content: string;
+}
+
+/**
+ * RetrieveGuildUserOptions is the initialization to retrieve a guild user.
+ */
+export interface RetrieveGuildUserOptions {
+  botToken: string;
+  guildID: string;
+  userID: string;
 }
