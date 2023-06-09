@@ -112,9 +112,6 @@ export async function handle(request: Request): Promise<Response> {
         {
           type:
             discord.InteractionResponseType.DeferredChannelMessageWithSource,
-          // data: {
-          //   flags: discord.MessageFlags.Ephemeral,
-          // },
         } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource,
       );
     }
