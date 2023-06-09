@@ -6,7 +6,8 @@
 
 ### 1. Create a Discord application
 
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+1. Go to the
+   [Discord Developer Portal](https://discord.com/developers/applications).
 2. Click **New Application**.
 3. Give your application a name and click **Create**.
 
@@ -30,8 +31,8 @@ You will need the following information:
 
 ### 4. Generate a PaLM API key
 
-> Note: You will need access to the PaLM API to generate an API key.
-> You can request access [here](https://makersuite.google.com/waitlist).
+> Note: You will need access to the PaLM API to generate an API key. You can
+> request access [here](https://makersuite.google.com/waitlist).
 
 - Create a PaLM API key [here](https://makersuite.google.com/app/apikey).
 
@@ -45,7 +46,9 @@ You will need the following information:
 
 You will need to use two terminal windows, one for the bot and one for ngrok.
 
-**Note:** You will need to have [ngrok](https://dashboard.ngrok.com/get-started/setup) installed and in your path.
+**Note:** You will need to have
+[ngrok](https://dashboard.ngrok.com/get-started/setup) installed and in your
+path.
 
 Terminal 1:
 
