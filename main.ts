@@ -81,10 +81,25 @@ export async function handle(request: Request): Promise<Response> {
         return new Response("Invalid request", { status: 400 });
       }
 
+      // Assert the message is not from the bot.
+      if (message.author.id === env.DISCORD_CLIENT_ID) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
+      // Create message URL.
+      const messageURL =
+        `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
+
+      const guildMemberAuthor = await api.retrieveGuildUser({
+        botToken: env.DISCORD_TOKEN,
+        guildID: interaction.guild_id!,
+        userID: message.author.id,
+      }) as discord.APIGuildMember;
+
       // Make the TLDROptions.
       const options: TLDROptions = {
         apiKey: env.PALM_API_KEY!,
-        author: message.author.username,
+        author: guildMemberAuthor.nick ?? guildMemberAuthor.user!.username,
         message: message.content,
       };
 
@@ -94,7 +109,7 @@ export async function handle(request: Request): Promise<Response> {
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
-            content: `TL;DR: ${result}`,
+            content: `TL;DR: ${result} \n\n↩${messageURL}`,
           });
         })
         .catch((error) => {

@@ -1,7 +1,9 @@
+import type { discord } from "../../deps.ts";
 import type {
   DiscordAPIClientInterface,
   EditOriginalInteractionResponseOptions,
   RegisterCommandOptions,
+  RetrieveGuildUserOptions,
 } from "./discord_api_client_interface.ts";
 
 /**
@@ -44,6 +46,27 @@ export class DiscordAPIClient implements DiscordAPIClientInterface {
         `Failed to edit original interaction response: ${response.status} ${response.statusText}`,
       );
     }
+  }
+
+  async retrieveGuildUser(
+    options: RetrieveGuildUserOptions,
+  ): Promise<discord.APIGuildMember> {
+    const url =
+      `${DISCORD_API_URL}/guilds/${options.guildID}/members/${options.userID}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: new Headers([
+        ["Content-Type", "application/json"],
+        ["Authorization", makeBotAuthorization(options.botToken)],
+      ]),
+    });
+    if (!response.ok) {
+      console.error("text:", await response.text());
+      throw new Error(
+        `Failed to retrieve guild user: ${response.status} ${response.statusText}`,
+      );
+    }
+    return await response.json();
   }
 }
 
