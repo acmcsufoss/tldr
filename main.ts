@@ -52,53 +52,58 @@ export async function handle(request: Request): Promise<Response> {
 
   // Parse the incoming request as JSON.
   const interaction = await JSON.parse(body) as discord.APIInteraction;
-  console.log({ interaction }); // TODO: Delete this console.log.
   switch (interaction.type) {
     case discord.InteractionType.Ping: {
       return Response.json({ type: discord.InteractionResponseType.Pong });
     }
 
     case discord.InteractionType.ApplicationCommand: {
+      // Assert the interaction is a context menu interaction.
       if (
         !discord.Utils.isContextMenuApplicationCommandInteraction(interaction)
       ) {
         return new Response("Invalid request", { status: 400 });
       }
 
-      if (!interaction.member?.user) {
+      // Assert the interaction member has the required role.
+      if (!interaction.member?.roles.includes(env.DISCORD_ROLE_ID)) {
         return new Response("Invalid request", { status: 400 });
       }
 
-      if (!interaction.message?.content) {
+      // Assert the interaction data is a message.
+      if (interaction.data.type !== discord.ApplicationCommandType.Message) {
         return new Response("Invalid request", { status: 400 });
       }
 
-      if (!interaction.member.roles.includes(env.DISCORD_ROLE_ID)) {
+      // Get the message.
+      const message = Object.values(interaction.data.resolved.messages)[0];
+      if (!message) {
         return new Response("Invalid request", { status: 400 });
       }
 
+      // Make the TLDROptions.
       const options: TLDROptions = {
         apiKey: env.PALM_API_KEY!,
-        author: interaction.member.user.username,
-        message: interaction.message?.content,
+        author: message.author.username,
+        message: message.content,
       };
 
       tldr(options)
-        .then((result) =>
+        .then((result) => {
           api.editOriginalInteractionResponse({
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
             content: `TLDR: ${result}`,
-          })
-        )
-        .catch((err) => {
-          if (err instanceof Error) {
+          });
+        })
+        .catch((error) => {
+          if (error instanceof Error) {
             api.editOriginalInteractionResponse({
               botID: env.DISCORD_CLIENT_ID,
               botToken: env.DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content: `Error: ${err.message}`,
+              content: `Error: ${error.message}`,
             });
           }
         });
@@ -107,9 +112,9 @@ export async function handle(request: Request): Promise<Response> {
         {
           type:
             discord.InteractionResponseType.DeferredChannelMessageWithSource,
-          data: {
-            flags: discord.MessageFlags.Ephemeral,
-          },
+          // data: {
+          //   flags: discord.MessageFlags.Ephemeral,
+          // },
         } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource,
       );
     }

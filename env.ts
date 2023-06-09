@@ -53,11 +53,12 @@ if (!RAW_DISCORD_ROLE_ID) {
  */
 export const DISCORD_ROLE_ID = RAW_DISCORD_ROLE_ID;
 
-/**
- * PALM_API_KEY is the API key for the Palm API.
- */
-export const PALM_API_KEY = Deno.env.get("PALM_API_KEY");
-
-if (!PALM_API_KEY) {
-  throw new Error("PALM_API_KEY environment variable is required");
+const RAW_PALM_API_KEY = Deno.env.get("PALM_API_KEY");
+if (!RAW_PALM_API_KEY) {
+  throw new Error("RAW_PALM_API_KEY environment variable is required");
 }
+
+/**
+ * PALM_API_KEY is the Palm API key.
+ */
+export const PALM_API_KEY = RAW_PALM_API_KEY;
