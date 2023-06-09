@@ -81,6 +81,11 @@ export async function handle(request: Request): Promise<Response> {
         return new Response("Invalid request", { status: 400 });
       }
 
+      // Assert the message is not from the bot.
+      if (message.author.id === env.DISCORD_CLIENT_ID) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
       // Create message URL.
       const messageURL =
         `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
