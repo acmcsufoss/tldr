@@ -3,6 +3,7 @@ import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
 import { APP_TLDR } from "./bot/app/app.ts";
 import { tldr, TLDROptions } from "./tldr.ts";
+import { consoleSize } from "https://deno.land/std@0.125.0/_deno_unstable.ts";
 
 const api = new DiscordAPIClient();
 
@@ -81,6 +82,10 @@ export async function handle(request: Request): Promise<Response> {
         return new Response("Invalid request", { status: 400 });
       }
 
+      // Create message URL.
+      const messageURL =
+        `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
+
       // Make the TLDROptions.
       const options: TLDROptions = {
         apiKey: env.PALM_API_KEY!,
@@ -94,7 +99,7 @@ export async function handle(request: Request): Promise<Response> {
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
-            content: `TL;DR: ${result}`,
+            content: `TL;DR: ${result} \n\n${messageURL}`,
           });
         })
         .catch((error) => {
