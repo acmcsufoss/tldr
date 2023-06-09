@@ -3,7 +3,6 @@ import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./bot/discord/mod.ts";
 import { APP_TLDR } from "./bot/app/app.ts";
 import { tldr, TLDROptions } from "./tldr.ts";
-import { consoleSize } from "https://deno.land/std@0.125.0/_deno_unstable.ts";
 
 const api = new DiscordAPIClient();
 
