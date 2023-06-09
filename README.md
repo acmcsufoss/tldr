@@ -44,16 +44,16 @@ You will need the following information:
 
 ### Development
 
-You will need to use two terminal windows, one for the bot and one for ngrok.
+You will need to use two terminal windows; one for the bot and one for Ngrok.
 
 **Note:** You will need to have
-[ngrok](https://dashboard.ngrok.com/get-started/setup) installed and in your
+[Ngrok](https://dashboard.ngrok.com/get-started/setup) installed and in your
 path.
 
 Terminal 1:
 
 ```bash
-deno task run
+deno task start
 ```
 
 Terminal 2:
