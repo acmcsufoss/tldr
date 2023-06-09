@@ -1,11 +1,10 @@
+import type { discord } from "../../deps.ts";
 import type {
   DiscordAPIClientInterface,
   EditOriginalInteractionResponseOptions,
   RegisterCommandOptions,
   RetrieveGuildUserOptions,
 } from "./discord_api_client_interface.ts";
-
-import type { discord } from "../../deps.ts";
 
 /**
  * DiscordAPIClient is a client for the Discord API.

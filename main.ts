@@ -109,7 +109,7 @@ export async function handle(request: Request): Promise<Response> {
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
-            content: `TL;DR: ${result} \n\n${messageURL}`,
+            content: `TL;DR: ${result} \n\n ${messageURL}`,
           });
         })
         .catch((error) => {
