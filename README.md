@@ -72,3 +72,7 @@ your Discord application. Find your application
 [here](https://discord.com/developers/applications).
 
 The bot should now be running and ready to use! 🚀
+
+---
+
+Maintained with 🌴 by [**@acmcsufoss**](https://oss.acmcsuf.com)
