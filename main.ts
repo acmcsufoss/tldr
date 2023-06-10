@@ -22,7 +22,7 @@ export async function main() {
   console.log(
     "TLDR application command:\n",
     `- Local: http://localhost:${env.PORT}/\n`,
-    `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands\n`,
+    `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands%20guilds.members.read%20bot&permissions=0\n`,
     `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
   );
 
@@ -75,6 +75,11 @@ export async function handle(request: Request): Promise<Response> {
         return new Response("Invalid request", { status: 400 });
       }
 
+      // Assert the guild ID is present.
+      if (!interaction.guild_id) {
+        return new Response("Invalid request", { status: 400 });
+      }
+
       // Get the message.
       const message = Object.values(interaction.data.resolved.messages)[0];
       if (!message) {
@@ -86,22 +91,23 @@ export async function handle(request: Request): Promise<Response> {
         return new Response("Invalid request", { status: 400 });
       }
 
-      // Create message URL.
-      const messageURL =
-        `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
-
-      const guildMemberAuthor = await api.retrieveGuildUser({
+      // Get the guild member author.
+      const author = await api.retrieveGuildUser({
         botToken: env.DISCORD_TOKEN,
-        guildID: interaction.guild_id!,
+        guildID: interaction.guild_id,
         userID: message.author.id,
-      }) as discord.APIGuildMember;
+      });
 
       // Make the TLDROptions.
       const options: TLDROptions = {
-        apiKey: env.PALM_API_KEY!,
-        author: guildMemberAuthor.nick ?? guildMemberAuthor.user!.username,
+        apiKey: env.PALM_API_KEY,
+        author: author.nick ?? message.author.username,
         message: message.content,
       };
+
+      // Create message URL.
+      const messageURL =
+        `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
 
       tldr(options)
         .then((result) => {

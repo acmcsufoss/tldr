@@ -51,8 +51,7 @@ export class DiscordAPIClient implements DiscordAPIClientInterface {
   async retrieveGuildUser(
     options: RetrieveGuildUserOptions,
   ): Promise<discord.APIGuildMember> {
-    const url =
-      `${DISCORD_API_URL}/guilds/${options.guildID}/members/${options.userID}`;
+    const url = makeRetrieveGuildUserURL(options.guildID, options.userID);
     const response = await fetch(url, {
       method: "GET",
       headers: new Headers([
@@ -96,6 +95,17 @@ export function makeEditOriginalInteractionResponseURL(
   base = DISCORD_API_URL,
 ) {
   return `${base}/webhooks/${clientID}/${interactionToken}/messages/@original`;
+}
+
+/**
+ * makeRetrieveGuildUserURL makes the URL to retrieve a guild user.
+ */
+export function makeRetrieveGuildUserURL(
+  guildID: string,
+  userID: string,
+  base = DISCORD_API_URL,
+) {
+  return `${base}/guilds/${guildID}/members/${userID}`;
 }
 
 /**
