@@ -31,7 +31,7 @@ export async function main() {
 }
 
 /**
- * handle is the HTTP handler for the Boardd application command.
+ * handle is the HTTP handler for the TLDR application command.
  */
 export async function handle(request: Request): Promise<Response> {
   const { error, body } = await verify(request, env.DISCORD_PUBLIC_KEY);
