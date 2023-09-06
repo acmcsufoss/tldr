@@ -27,18 +27,7 @@ export async function main() {
   );
 
   // Start the server.
-  const server = Deno.listen({ port: env.PORT });
-  for await (const conn of server) {
-    serveHttp(conn);
-  }
-}
-
-async function serveHttp(conn: Deno.Conn) {
-  const httpConn = Deno.serveHttp(conn);
-  for await (const requestEvent of httpConn) {
-    const response = await handle(requestEvent.request);
-    requestEvent.respondWith(response);
-  }
+  Deno.serve({ port: env.PORT }, handle);
 }
 
 /**
