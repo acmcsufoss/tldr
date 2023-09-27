@@ -10,24 +10,30 @@ if (import.meta.main) {
   await main();
 }
 
-export async function main() {
-  // Overwrite the Discord Application Command.
-  await api.registerCommand({
-    app: APP_TLDR,
-    botID: env.DISCORD_CLIENT_ID,
-    botToken: env.DISCORD_TOKEN,
-  });
+export function main() {
+  // Define onListen callback.
+  async function onListen() {
+    // Overwrite the Discord Application Command.
+    await api.registerCommand({
+      app: APP_TLDR,
+      botID: env.DISCORD_CLIENT_ID,
+      botToken: env.DISCORD_TOKEN,
+    });
 
-  // Log the application command.
-  console.log(
-    "TLDR application command:\n",
-    `- Local: http://localhost:${env.PORT}/\n`,
-    `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands%20guilds.members.read%20bot&permissions=0\n`,
-    `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
-  );
+    // Log the application command.
+    console.log(
+      "TLDR application command:\n",
+      `- Local: http://localhost:${env.PORT}/\n`,
+      `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands%20guilds.members.read%20bot&permissions=0\n`,
+      `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
+    );
+  }
 
   // Start the server.
-  Deno.serve({ port: env.PORT }, handle);
+  Deno.serve(
+    { port: env.PORT, onListen },
+    handle,
+  );
 }
 
 /**
