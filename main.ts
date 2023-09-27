@@ -104,13 +104,14 @@ export async function handle(request: Request): Promise<Response> {
       const messageURL =
         `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
 
+      // Send the TLDR.
       tldr(options)
         .then((result) => {
           api.editOriginalInteractionResponse({
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
-            content: `TL;DR: ${result} \n\n↩${messageURL}`,
+            content: formatContent(`TL;DR: ${result}`, messageURL),
           });
         })
         .catch((error) => {
@@ -119,7 +120,7 @@ export async function handle(request: Request): Promise<Response> {
               botID: env.DISCORD_CLIENT_ID,
               botToken: env.DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content: `Error: ${error.message}`,
+              content: formatContent(`Error: ${error.message}`, messageURL),
             });
           }
         });
@@ -136,4 +137,8 @@ export async function handle(request: Request): Promise<Response> {
       return new Response("Invalid request", { status: 400 });
     }
   }
+}
+
+function formatContent(content: string, messageURL: string) {
+  return `${content} \n\n↩${messageURL}`;
 }
