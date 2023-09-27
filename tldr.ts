@@ -30,7 +30,15 @@ export async function tldr(options: TLDROptions) {
   );
 
   const data = await response.json();
+  if (data.candidates === undefined || data.candidates.length === 0) {
+    throw new Error("No TLDR message can be generated.");
+  }
+
   const result = data.candidates[0].output;
+  if (typeof result !== "string") {
+    throw new Error("No TLDR message can be generated.");
+  }
+
   return result;
 }
 
