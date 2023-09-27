@@ -10,24 +10,30 @@ if (import.meta.main) {
   await main();
 }
 
-export async function main() {
-  // Overwrite the Discord Application Command.
-  await api.registerCommand({
-    app: APP_TLDR,
-    botID: env.DISCORD_CLIENT_ID,
-    botToken: env.DISCORD_TOKEN,
-  });
+export function main() {
+  // Define onListen callback.
+  async function onListen() {
+    // Overwrite the Discord Application Command.
+    await api.registerCommand({
+      app: APP_TLDR,
+      botID: env.DISCORD_CLIENT_ID,
+      botToken: env.DISCORD_TOKEN,
+    });
 
-  // Log the application command.
-  console.log(
-    "TLDR application command:\n",
-    `- Local: http://localhost:${env.PORT}/\n`,
-    `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands%20guilds.members.read%20bot&permissions=0\n`,
-    `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
-  );
+    // Log the application command.
+    console.log(
+      "TLDR application command:\n",
+      `- Local: http://localhost:${env.PORT}/\n`,
+      `- Invite: https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands%20guilds.members.read%20bot&permissions=0\n`,
+      `- Info: https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/information`,
+    );
+  }
 
   // Start the server.
-  Deno.serve({ port: env.PORT }, handle);
+  Deno.serve(
+    { port: env.PORT, onListen },
+    handle,
+  );
 }
 
 /**
@@ -98,13 +104,14 @@ export async function handle(request: Request): Promise<Response> {
       const messageURL =
         `https://discord.com/channels/${interaction.guild_id}/${message.channel_id}/${message.id}`;
 
+      // Send the TLDR.
       tldr(options)
         .then((result) => {
           api.editOriginalInteractionResponse({
             botID: env.DISCORD_CLIENT_ID,
             botToken: env.DISCORD_TOKEN,
             interactionToken: interaction.token,
-            content: `TL;DR: ${result} \n\n↩${messageURL}`,
+            content: formatContent(`TL;DR: ${result}`, messageURL),
           });
         })
         .catch((error) => {
@@ -113,7 +120,7 @@ export async function handle(request: Request): Promise<Response> {
               botID: env.DISCORD_CLIENT_ID,
               botToken: env.DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content: `Error: ${error.message}`,
+              content: formatContent(`Error: ${error.message}`, messageURL),
             });
           }
         });
@@ -130,4 +137,8 @@ export async function handle(request: Request): Promise<Response> {
       return new Response("Invalid request", { status: 400 });
     }
   }
+}
+
+function formatContent(content: string, messageURL: string) {
+  return `${content} \n\n↩${messageURL}`;
 }

@@ -29,16 +29,28 @@ export async function tldr(options: TLDROptions) {
     },
   );
 
+  // Throw generic error if the response is not ok.
+  if (!response.ok) {
+    throw TLDRError;
+  }
+
+  // Throw if the response is unauthorized.
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
+
+  // Throw generic error if the response is not expected JSON format.
   const data = await response.json();
   if (data.candidates === undefined || data.candidates.length === 0) {
-    throw new Error("No TLDR message can be generated.");
+    throw TLDRError;
   }
 
   const result = data.candidates[0].output;
   if (typeof result !== "string") {
-    throw new Error("No TLDR message can be generated.");
+    throw TLDRError;
   }
 
+  // Return the top candidate from the response.
   return result;
 }
 
@@ -50,3 +62,8 @@ export interface TLDROptions {
   author: string;
   message: string;
 }
+
+/**
+ * TLDRError is an error returned by the tldr function.
+ */
+export const TLDRError = new Error("No TLDR message can be generated.");
